@@ -1,3 +1,4 @@
+import SpaceFooter from "@/components/main/Footer";
 import SpaceNavbar from "@/components/main/Navbar";
 import { StarsCanvas } from "@/components/main/Star-Background";
 import { cn } from "@/lib/utils";
@@ -25,8 +26,9 @@ export default function RootLayout({ children }) {
         )}
       >
         <StarsCanvas />
-        <SpaceNavbar />
+        <SpaceNavbar className="fixed top-0 left-0 right-0 z-50" />
         {children}
+        <SpaceFooter />
       </body>
     </html>
   );

@@ -1,21 +1,62 @@
 "use client";
-import { Globe, Menu, Rocket, Satellite, Telescope, X } from "lucide-react";
+import { ChevronUp, Globe, Rocket, Satellite, Telescope } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const SpaceNavbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState("");
+  const [hoveredItem, setHoveredItem] = useState(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+      const currentScrollPos = window.scrollY;
+      setShowScrollTop(currentScrollPos > 100);
+
+      const sections = ["home", "earth", "space", "mars"];
+      let current = "";
+
+      for (const section of sections) {
+        const element = document.getElementById(section);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          if (
+            rect.top <= window.innerHeight / 3 &&
+            rect.bottom >= window.innerHeight / 3
+          ) {
+            current = section;
+          }
+        }
+      }
+
+      setActiveSection(current);
     };
-    window.addEventListener("scroll", handleScroll);
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  const handleNavClick = (e, href) => {
+    e.preventDefault();
+    const element = document.querySelector(href);
+
+    if (element) {
+      const offsetTop = element.offsetTop;
+      window.scrollTo({
+        top: offsetTop,
+        behavior: "smooth",
+      });
+    }
+  };
+
   const navItems = [
-    { name: "Home", href: "#", icon: Rocket },
+    { name: "Home", href: "#home", icon: Rocket },
     { name: "Earth Climate", href: "#earth", icon: Globe },
     { name: "Space Explorer", href: "#space", icon: Telescope },
     { name: "Mars Rover", href: "#mars", icon: Satellite },
@@ -23,131 +64,122 @@ const SpaceNavbar = () => {
 
   return (
     <>
-      {/* Navbar */}
-      <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ease-in-out ${
-          scrolled
-            ? "bg-[#030014]/80 backdrop-blur-xl border-b border-purple-500/20"
-            : "bg-transparent"
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <div className="flex-shrink-0 group">
-              <div className="flex items-center space-x-3">
-                <div className="relative">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-400 p-0.5 group-hover:scale-110 transition-transform duration-300">
-                    <div className="w-full h-full rounded-full bg-[#030014] flex items-center justify-center">
-                      <Rocket className="w-5 h-5 text-cyan-400 group-hover:rotate-12 transition-transform duration-300" />
-                    </div>
+      {/* Always visible nav bar */}
+      <div className="fixed top-6 left-0 right-0 z-50 flex justify-center px-4">
+        <div className="relative">
+          {/* Background blur */}
+          <div className="absolute inset-0 rounded-2xl bg-[#030014]/50 backdrop-blur-md border border-purple-500/10 shadow-[0_8px_32px_rgba(139,92,246,0.12)]" />
+
+          {/* Logo - positioned to the left */}
+
+          {/*          
+          <div className="absolute -left-20 top-1/2 -translate-y-1/2 group hidden lg:flex">
+            <div className="flex items-center space-x-3">
+              <div className="relative">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-400 p-0.5 group-hover:scale-110 transition-transform duration-300">
+                  <div className="w-full h-full rounded-full bg-[#030014] flex items-center justify-center">
+                    <Rocket className="w-5 h-5 text-cyan-400 group-hover:rotate-12 transition-transform duration-300" />
                   </div>
-                  {/* Orbital ring animation */}
-                  <div
-                    className="absolute inset-0 rounded-full border border-cyan-400/30 animate-spin"
-                    style={{ animationDuration: "3s" }}
-                  />
-                  <div
-                    className="absolute inset-1 rounded-full border border-purple-400/20 animate-spin"
-                    style={{
-                      animationDuration: "4s",
-                      animationDirection: "reverse",
-                    }}
-                  />
                 </div>
-                <div className="hidden sm:block">
-                  <h1 className="text-xl font-bold Welcome-text">
-                    Earth & Space Explorer
-                  </h1>
-                </div>
-              </div>
-            </div>
-
-            {/* Desktop Navigation */}
-            <div className="hidden md:block">
-              <div className="ml-10 flex items-baseline space-x-1">
-                {navItems.map((item, index) => {
-                  const IconComponent = item.icon;
-                  return (
-                    <a
-                      key={item.name}
-                      href={item.href}
-                      className="group relative px-4 py-2 rounded-xl text-gray-300 hover:text-white transition-all duration-300 hover:scale-105"
-                      style={{
-                        animationDelay: `${index * 100}ms`,
-                      }}
-                    >
-                      {/* Hover background effect */}
-                      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-600/0 via-blue-600/0 to-cyan-600/0 group-hover:from-purple-600/20 group-hover:via-blue-600/20 group-hover:to-cyan-600/20 transition-all duration-300 opacity-0 group-hover:opacity-100" />
-                      <div className="absolute inset-0 rounded-xl bg-white/0 group-hover:bg-white/5 backdrop-blur-sm transition-all duration-300" />
-
-                      {/* Content */}
-                      <div className="relative flex items-center space-x-2">
-                        <IconComponent className="w-4 h-4 group-hover:text-cyan-400 transition-colors duration-300" />
-                        <span className="font-medium">{item.name}</span>
-                      </div>
-
-                      {/* Animated underline */}
-                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 rounded-full" />
-                    </a>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Mobile menu button */}
-            <div className="md:hidden">
-              <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="relative p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-all duration-300 group"
-              >
-                <div className="w-6 h-6 relative">
-                  <Menu
-                    className={`absolute inset-0 transition-all duration-300 ${
-                      isOpen ? "opacity-0 rotate-90" : "opacity-100 rotate-0"
-                    }`}
-                  />
-                  <X
-                    className={`absolute inset-0 transition-all duration-300 ${
-                      isOpen ? "opacity-100 rotate-0" : "opacity-0 -rotate-90"
-                    }`}
-                  />
-                </div>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Navigation Menu */}
-        <div
-          className={`md:hidden transition-all duration-500 ease-in-out overflow-hidden ${
-            isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-          }`}
-        >
-          <div className="px-4 pt-2 pb-6 space-y-2 bg-[#030014]/95 backdrop-blur-xl border-b border-purple-500/20">
-            {navItems.map((item, index) => {
-              const IconComponent = item.icon;
-              return (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  className="group flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-300 hover:text-white transition-all duration-300 hover:bg-white/5"
-                  onClick={() => setIsOpen(false)}
+                {/* Orbital ring animation */}
+          {/* <div
+                  className="absolute inset-0 rounded-full border border-cyan-400/30 animate-spin"
+                  style={{ animationDuration: "3s" }}
+                />
+                <div
+                  className="absolute inset-1 rounded-full border border-purple-400/20 animate-spin"
                   style={{
-                    animationDelay: `${index * 50}ms`,
+                    animationDuration: "4s",
+                    animationDirection: "reverse",
                   }}
-                >
-                  <div className="p-2 rounded-lg bg-gradient-to-r from-purple-600/20 to-cyan-600/20 group-hover:from-purple-600/40 group-hover:to-cyan-600/40 transition-all duration-300">
-                    <IconComponent className="w-4 h-4 group-hover:text-cyan-400 transition-colors duration-300" />
-                  </div>
-                  <span className="font-medium">{item.name}</span>
-                  <div className="ml-auto w-2 h-2 rounded-full bg-gradient-to-r from-purple-500 to-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </a>
-              );
-            })}
-          </div>
+                />
+              </div>
+            </div>
+          </div> */}
+
+          {/* Navigation */}
+          <nav
+            className="relative px-3 py-3 rounded-2xl"
+            role="navigation"
+            aria-label="Main navigation"
+          >
+            <ul className="flex items-center justify-center space-x-1">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = activeSection === item.href.slice(1);
+                const isHovered = hoveredItem === item.name;
+
+                return (
+                  <li key={item.name} className="relative">
+                    <a
+                      href={item.href}
+                      onClick={(e) => handleNavClick(e, item.href)}
+                      onMouseEnter={() => setHoveredItem(item.name)}
+                      onMouseLeave={() => setHoveredItem(null)}
+                      className={`
+                        relative z-10 flex items-center gap-2 px-4 py-2 rounded-xl
+                        text-sm font-medium transition-all duration-300 hover:scale-105
+                        ${
+                          isActive
+                            ? "text-white"
+                            : "text-gray-300 hover:text-white"
+                        }
+                      `}
+                      aria-current={isActive ? "page" : undefined}
+                    >
+                      <Icon className="w-4 h-4" />
+                      <span className="hidden sm:inline">{item.name}</span>
+                      <span
+                        className={`
+                        absolute left-1/2 -translate-x-1/2 whitespace-nowrap
+                        px-2 py-1 text-xs rounded-md transition-all duration-200
+                        bg-[#030014] text-gray-300 border border-purple-500/20
+                        opacity-0 -translate-y-10 pointer-events-none sm:hidden
+                        ${isHovered ? "opacity-100 -translate-y-8" : ""}
+                      `}
+                      >
+                        {item.name}
+                      </span>
+                    </a>
+
+                    {/* Active indicator */}
+                    {isActive && (
+                      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-500/80 to-cyan-600/80 transition-all duration-300" />
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
         </div>
-      </nav>
+      </div>
+
+      {/* Scroll-to-top button - only visible when scrolling */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-6 right-6 p-3 rounded-xl bg-[#030014]/50 backdrop-blur-md border border-purple-500/10 shadow-[0_8px_32px_rgba(139,92,246,0.12)] text-gray-400 hover:text-gray-100 hover:bg-purple-500/20 hover:scale-110 transition-all duration-300"
+          aria-label="Scroll to top"
+        >
+          <ChevronUp className="w-5 h-5" />
+        </button>
+      )}
+
+      {/* Mobile Logo */}
+      <div className="fixed top-2 left-4 z-50 lg:hidden">
+        <div className="flex items-center space-x-3">
+          <div className="relative">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-400 p-0.5">
+              <div className="w-full h-full rounded-full bg-[#030014] flex items-center justify-center">
+                <Rocket className="w-4 h-4 text-cyan-400" />
+              </div>
+            </div>
+          </div>
+          <h1 className="text-sm font-bold Welcome-text">
+            Earth & Space Explorer
+          </h1>
+        </div>
+      </div>
 
       {/* Spacer to prevent content from going under fixed navbar */}
       <div className="h-16" />
