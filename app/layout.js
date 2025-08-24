@@ -18,7 +18,7 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={cn(
           "bg-[#030014] overflow-y-scroll overflow-x-hidden",
@@ -28,7 +28,7 @@ export default function RootLayout({ children }) {
         <StarsCanvas />
         <SpaceNavbar className="fixed top-0 left-0 right-0 z-50" />
         {children}
-        <SpaceFooter />
+        <SpaceFooter suppressHydrationWarning />
       </body>
     </html>
   );
